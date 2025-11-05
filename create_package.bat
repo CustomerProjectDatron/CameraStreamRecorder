@@ -162,7 +162,7 @@ if "!LAST_TAG!"=="" (
 REM Create the archive with 7-Zip
 echo Adding files to archive...
 echo Sources to include: !SOURCES!
-"!SEVENZIP!" a -tzip "!PACKAGENAME!" "metadata.json" "!CHANGELOG_FILE!" !SOURCES!
+"!SEVENZIP!" a -tzip "!PACKAGENAME!" "metadata.json" "!CHANGELOG_FILE!" README.md !SOURCES!
 
 REM Check result
 if exist "!PACKAGENAME!" (
@@ -220,4 +220,3 @@ if exist "!PACKAGENAME!" (
 )
 
 pause
-

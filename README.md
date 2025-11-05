@@ -1,4 +1,4 @@
-# NextStreamRecorder
+# CameraStreamRecorder
 
 ## Installation for Development
 

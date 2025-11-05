@@ -1,0 +1,13 @@
+module CameraStreamRecorderTest
+
+@ MeasuringSystem = "Metric" @
+
+using Base
+using CameraStreamRecorder
+
+export program Main
+    
+endprogram
+
+end
+

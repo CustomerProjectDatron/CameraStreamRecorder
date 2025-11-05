@@ -1,24 +1,24 @@
-# Paketverwaltung (Next Packages)
+ï»¿# Paketverwaltung (Next Packages)
 
 Diese Dokumentation beschreibt Aufbau, Erstellung und Installation von Paketen sowie das erforderliche `metadata.json` Format.
 
 
 ## Struktur eines Pakets (.nextpkg)
 
-Ein gültiges Paket ist eine ZIP-Datei mit der Dateiendung ".nextpkg" und folgendem Mindestinhalt in der ROOT-Ebene:
+Ein gÃ¼ltiges Paket ist eine ZIP-Datei mit der Dateiendung ".nextpkg" und folgendem Mindestinhalt in der ROOT-Ebene:
 ```
 <PackageName>.nextpkg
- +- metadata.json          (Pflicht)
- +- readme.md              (Optional; überschreibt Description)
- +- <Dateien / Ordner gemäß FileMappings.Source>
- ¦   +- ...
- +- (Bilder für README, falls referenziert)
+ â”œâ”€ metadata.json          (Pflicht)
+ â”œâ”€ readme.md              (Optional; Ã¼berschreibt Description)
+ â”œâ”€ <Dateien / Ordner gemÃ¤ÃŸ FileMappings.Source>
+ â”‚   â”œâ”€ ...
+ â””â”€ (Bilder fÃ¼r README, falls referenziert)
 ```
 
 Wichtig:
-- `metadata.json` und (falls vorhanden) `readme.md` müssen direkt im Root der ZIP liegen (nicht in Unterordnern).
-- Alle in `FileMappings.Source` referenzierten relativen Pfade müssen exakt so im ZIP vorhanden sein.
-- Groß-/Kleinschreibung wird beim Suchen nach `metadata.json` / `readme.md` ignoriert.
+- `metadata.json` und (falls vorhanden) `readme.md` mÃ¼ssen direkt im Root der ZIP liegen (nicht in Unterordnern).
+- Alle in `FileMappings.Source` referenzierten relativen Pfade mÃ¼ssen exakt so im ZIP vorhanden sein.
+- GroÃŸ-/Kleinschreibung wird beim Suchen nach `metadata.json` / `readme.md` ignoriert.
 
 ## Datei: metadata.json
 
@@ -27,7 +27,7 @@ Wichtig:
 {
   "Name": "string (Pflicht)",
   "Author": "string (Pflicht)",
-  "Description": "string (Optional – wird überschrieben wenn readme.md vorhanden)",
+  "Description": "string (Optional â€“ wird Ã¼berschrieben wenn readme.md vorhanden)",
   "FileMappings": [
     {
       "Source": "relativer\\pfad\\zur\\datei.od.ordner",
@@ -43,13 +43,13 @@ Wichtig:
 
 ### Erlaubtes Destination-Schema
 
-`Destination` MUSS mit genau einem der folgenden Präfixe beginnen:
-- `machine:`   ? entspricht "Machine"-Ordner in next. Kundensichtbare Programme. Unterordner "Library" kann verwendet werden.
-- `internal:`  ? Interne Bibliotheken, nicht kundensichtbar.
-- `plugin:`    ? Ordner für externe Anwendungen die über SimPL gestartet werden können.
+`Destination` MUSS mit genau einem der folgenden PrÃ¤fixe beginnen:
+- `machine:`   â†’ entspricht "Machine"-Ordner in next. Kundensichtbare Programme. Unterordner "Library" kann verwendet werden.
+- `internal:`  â†’ Interne Bibliotheken, nicht kundensichtbar.
+- `plugin:`    â†’ Ordner fÃ¼r externe Anwendungen die Ã¼ber SimPL gestartet werden kÃ¶nnen.
 
 
-Beispiele für gültige Destination-Werte:
+Beispiele fÃ¼r gÃ¼ltige Destination-Werte:
 ```
 plugin:
 plugin:\\MeinPlugin
@@ -58,7 +58,7 @@ internal:\\NichtKundenSichtbareLibrary
 ```
 
 
-### FileMappings – Kopierlogik
+### FileMappings â€“ Kopierlogik
 
 
 - `Destination` bestimmt den Zielordner, an den `Source` kopiert wird
@@ -71,7 +71,7 @@ internal:\\NichtKundenSichtbareLibrary
 {
   "Name": "BeispielPlugin",
   "Author": "DATRON",
-  "Description": "Fallback Beschreibung – wird ersetzt falls readme.md existiert.",
+  "Description": "Fallback Beschreibung â€“ wird ersetzt falls readme.md existiert.",
   "FileMappings": [
     {
       "Source": "plugin\\BeispielPlugin.exe",
@@ -92,17 +92,17 @@ internal:\\NichtKundenSichtbareLibrary
 ### Beispiel Verzeichnisstruktur (im Paket)
 ```
 BeispielPlugin.nextpkg
- +- metadata.json
- +- readme.md
- +- plugin
- ¦   +- BeispielPlugin.exe
- ¦   +- settings.json
- +- library
-     +- BeispielLibrary.simpl 
-     +- Anleitung.md
-     +- Samples
-         +- Sample1.simpl
-         +- Sample2.simpl
+ â”œâ”€ metadata.json
+ â”œâ”€ readme.md
+ â”œâ”€ plugin
+ â”‚   â”œâ”€ BeispielPlugin.exe
+ â”‚   â””â”€ settings.json
+ â””â”€ library
+     â”œâ”€ BeispielLibrary.simpl 
+     â”œâ”€ Anleitung.md
+     â””â”€ Samples
+         â”œâ”€ Sample1.simpl
+         â””â”€ Sample2.simpl
 ```
 
 Installationsresultat (schematisch):
@@ -118,36 +118,34 @@ C:\Data\Programs\Library\BeispielLibrary\Samples\Sample2.simpl
 ## README (optional)
 
 - Datei: `readme.md` im Root.
-- Wird vollständig als `PackageMetadata.Description` übernommen.
-- unterstützt Markdown und wird vor der Installation in next angezeigt
-- Bildreferenzen (Markdown `![](...)`) sind möglich (Pfade müssen im Paket existieren).
+- Wird vollstÃ¤ndig als `PackageMetadata.Description` Ã¼bernommen.
+- unterstÃ¼tzt Markdown und wird vor der Installation in next angezeigt
+- Bildreferenzen (Markdown `![](...)`) sind mÃ¶glich (Pfade mÃ¼ssen im Paket existieren).
 
 ## Typische Fehlerquellen
 
-| Fehlermeldung | Ursache | Lösung |
+| Fehlermeldung | Ursache | LÃ¶sung |
 | ------------- | ------- | ------ |
-| `Package file not found.` | Pfad zur ZIP falsch | Pfad prüfen |
-| `Package metadata file not found.` | `metadata.json` fehlt oder falsch platziert | In Root hinzufügen |
-| `Package metadata is invalid.` | Ungültiges JSON oder fehlende Pflichtfelder | JSON validieren |
-| `Package metadata is invalid.` | Destination ohne gültiges Präfix | Präfix `machine:`, `internal:` oder `plugin:` verwenden |
-| `Failed to install because of an IO error.` | Unerwartete IO-Exception (Sperre, Rechte) | Datei-/Rechte-Situation prüfen |
-| `Package file could not be opened.` | ZIP-Datei beschädigt | ZIP-Datei prüfen |
+| `Package file not found.` | Pfad zur ZIP falsch | Pfad prÃ¼fen |
+| `Package metadata file not found.` | `metadata.json` fehlt oder falsch platziert | In Root hinzufÃ¼gen |
+| `Package metadata is invalid.` | UngÃ¼ltiges JSON oder fehlende Pflichtfelder | JSON validieren |
+| `Package metadata is invalid.` | Destination ohne gÃ¼ltiges PrÃ¤fix | PrÃ¤fix `machine:`, `internal:` oder `plugin:` verwenden |
+| `Failed to install because of an IO error.` | Unerwartete IO-Exception (Sperre, Rechte) | Datei-/Rechte-Situation prÃ¼fen |
+| `Package file could not be opened.` | ZIP-Datei beschÃ¤digt | ZIP-Datei prÃ¼fen |
 
 
-## Erstellung eines Pakets – Schritt für Schritt
+## Erstellung eines Pakets â€“ Schritt fÃ¼r Schritt
 
 1. Arbeitsordner anlegen (Name = geplanter Paketname).
-2. `metadata.json` gemäß Schema erstellen (Destination-Präfixe beachten).
-3. (Optional) `readme.md` hinzufügen (Markdown, Bilder relative Pfade).
+2. `metadata.json` gemÃ¤ÃŸ Schema erstellen (Destination-PrÃ¤fixe beachten).
+3. (Optional) `readme.md` hinzufÃ¼gen (Markdown, Bilder relative Pfade).
 4. Alle referenzierten `Source`-Dateien/Ordner in diesen Root legen.
-5. ZIP erzeugen (Inhalt = Root-Inhalt, nicht zusätzlichen übergeordneten Ordner einpacken) und auf `.nextpkg` umbenennen.
+5. ZIP erzeugen (Inhalt = Root-Inhalt, nicht zusÃ¤tzlichen Ã¼bergeordneten Ordner einpacken) und auf `.nextpkg` umbenennen.
 6. Datei benennen (z.B. `BeispielPlugin.nextpkg`).
-7. Paket durch Installation in next prüfen.
+7. Paket durch Installation in next prÃ¼fen.
 
 
 ---
 
-Bei Änderungen am Schema bitte diese README aktualisieren.
-
-
+Bei Ã„nderungen am Schema bitte diese README aktualisieren.
 
