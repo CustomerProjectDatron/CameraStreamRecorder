@@ -1,0 +1,7 @@
+module {{PROJECT_NAME}}
+
+@ MeasuringSystem = "Metric" @
+
+
+
+end

@@ -1,0 +1,16 @@
+**/*.MetaData
+**/*.json
+**/*.*.bak
+**/*.csv
+**/*.html
+**/*.txt
+**/*.states
+**/*.positions
+
+Install/
+Library-2024-12-11/**/*.*
+Logging/*.*
+Templates/
+HandheldFunctionKeys/
+
+
