@@ -1,4 +1,4 @@
-# {{PROJECT_NAME}}
+# NextStreamRecorder
 
 ## Installation for Development
 
@@ -42,3 +42,5 @@ To install SimPL-Extension on customer machines, follow these steps:
 3. Open the Next software on the target machine. Go to the folder where you copied the `nextpkg` file. Install the package by clicking the install button on it.
 
 ---
+
+
