@@ -7,9 +7,9 @@ import Base
 
 export program Main
     #CameraStreamRecorder::HelpRecording
-    record1= CameraStreamRecorder::StartRecording filename="TestRecordOverview" compress  Overview
-    record2= CameraStreamRecorder::StartRecording filename="TestRecordNeedle" compress  Needle
-    record3= CameraStreamRecorder::StartRecording filename="TestRecordWebcam" compress  Webcam
+    record1 = CameraStreamRecorder::StartRecording filename="TestRecordOverview" compress  Overview
+    record2 = CameraStreamRecorder::StartRecording filename="TestRecordNeedle" compress  Needle
+    record3 = CameraStreamRecorder::StartRecording filename="TestRecordWebcam" compress  Webcam
     
     Base::Sleep
     

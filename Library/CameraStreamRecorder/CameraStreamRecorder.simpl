@@ -19,9 +19,7 @@ enumeration Cameras(
     Webcam
 )
 
-export program Main
-HelpRecording
-endprogram
+debugMode = false
 
 @doc: Shows the help for the CameraStreamRecorder program.@
 export program HelpRecording
@@ -32,7 +30,7 @@ For installation you must follow the this steps:
 
 1. Login as Service
 2. Go to this settings ""Service settings\Developer settings\Allow execution of external processes via SimPL"" and enable this feature
-
+"
     Dialog message=message caption="Camera recorder" enableMarkdown
 endprogram
 
@@ -53,7 +51,6 @@ If the record is not stopped during the this time and the program is finished th
         cameraStream =Cameras.Overview
     endif
     
-   
     if not recordingTime hasvalue
         recordingTime = 300
  
@@ -101,10 +98,12 @@ If the record is not stopped during the this time and the program is finished th
         argsString <- argsString + " " + arg
     endforeach
     
-    Development::CopyToClipboard value=argsString
+    if debugMode    
+        Development::CopyToClipboard value=argsString
+        StatusMessage = argsString
+        Development::CopyToClipboard value=argsString
+    endif
 
-    StatusMessage = argsString
-    Development::CopyToClipboard value=argsString
     handle =  Plugin::PluginStart(
         programPath="ffmpeg.exe"     
         arguments=argsString) 
@@ -124,7 +123,9 @@ export program StopRecording(
     Plugin::PluginWriteLine processId=recordId line="q"  errorHandler=ref errorHandler 
     pluginResultLine = Plugin::PluginReadError processId=recordId errorHandler=ref errorHandler
     while errorHandler == ""
-        StatusMessage = pluginResultLine          
+        if debugMode
+            StatusMessage = pluginResultLine 
+        endif         
         pluginResultLine = Plugin::PluginReadError processId=recordId errorHandler=ref errorHandler
     endwhile 
     
