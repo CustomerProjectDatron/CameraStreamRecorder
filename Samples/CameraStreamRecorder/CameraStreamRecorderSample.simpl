@@ -2,8 +2,8 @@ module CameraStreamRecorderSample
 
 @ MeasuringSystem = "Metric" @
 
+using Base
 import CameraStreamRecorder
-import Base
 
 export program Main
     #CameraStreamRecorder::HelpRecording
@@ -11,7 +11,7 @@ export program Main
     record2 = CameraStreamRecorder::StartRecording filename="TestRecordNeedle" compress  Needle
     record3 = CameraStreamRecorder::StartRecording filename="TestRecordWebcam" compress  Webcam
     
-    Base::Sleep
+    Sleep seconds = 5
     
     CameraStreamRecorder::StopRecording recordId=ref record1
     CameraStreamRecorder::StopRecording recordId=ref record2

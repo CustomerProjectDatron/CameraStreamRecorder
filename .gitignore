@@ -6,6 +6,8 @@
 **/*.txt
 **/*.states
 **/*.positions
+**/*.nextpkg
+**/*.nextpkg
 
 Install/
 Library-2024-12-11/**/*.*
