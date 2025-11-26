@@ -47,6 +47,10 @@ If the record is not stopped during the this time and the program is finished th
     optional compress:boolean           @doc:If set the result is compressed with libx264@
     ) returns number
 
+    if Development::GetExecutionType == Development::ExecutionType.Visu
+        return 1
+    endif
+
     if not cameraStream hasvalue
         cameraStream =Cameras.Overview
     endif
@@ -114,6 +118,10 @@ endprogram
 export program StopRecording(
     ref recordId:number
     )
+ 
+    if Development::GetExecutionType == Development::ExecutionType.Visu
+        return
+    endif
  
     if recordId == -1    
         return
