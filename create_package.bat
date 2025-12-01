@@ -79,23 +79,6 @@ set "PACKAGENAME=%DIRNAME%_v!VERSION!.nextpkg"
 
 echo Creating package: !PACKAGENAME!
 
-REM Try to find 7-Zip installation
-set "SEVENZIP="
-if exist "%ProgramFiles%\7-Zip\7z.exe" (
-    set "SEVENZIP=%ProgramFiles%\7-Zip\7z.exe"
-) else if exist "%ProgramFiles(x86)%\7-Zip\7z.exe" (
-    set "SEVENZIP=%ProgramFiles(x86)%\7-Zip\7z.exe"
-) else (
-    echo 7-Zip not found in standard locations.
-    echo Please install 7-Zip from https://www.7-zip.org/
-    echo Or specify the path manually in this script.
-    pause
-    exit /b 1
-)
-
-echo Using 7-Zip: !SEVENZIP!
-echo.
-
 REM Parse metadata.json to get source directories
 echo Parsing metadata.json for source directories...
 set "SOURCES="
@@ -159,10 +142,36 @@ if "!LAST_TAG!"=="" (
     git diff --name-status !LAST_TAG!..HEAD >> "!CHANGELOG_FILE!" 2>nul
 )
 
-REM Create the archive with 7-Zip
-echo Adding files to archive...
+REM Create temporary directory for package contents
+set "TEMP_DIR=%TEMP%\!DIRNAME!_package_temp"
+echo Creating temporary directory: !TEMP_DIR!
+if exist "!TEMP_DIR!" rmdir /s /q "!TEMP_DIR!"
+mkdir "!TEMP_DIR!"
+
+REM Copy files to temporary directory
+echo Copying files to temporary directory...
+copy "metadata.json" "!TEMP_DIR!\" >nul
+copy "!CHANGELOG_FILE!" "!TEMP_DIR!\" >nul
+copy "README.md" "!TEMP_DIR!\" >nul
+
+REM Copy source directories
 echo Sources to include: !SOURCES!
-"!SEVENZIP!" a -tzip "!PACKAGENAME!" "metadata.json" "!CHANGELOG_FILE!" README.md !SOURCES!
+for %%s in (!SOURCES!) do (
+    if exist "%%s" (
+        echo Copying directory: %%s
+        xcopy "%%s" "!TEMP_DIR!\%%s" /E /I /Y >nul
+    ) else (
+        echo Warning: Source directory not found: %%s
+    )
+)
+
+REM Create package using NextPackageGenerator
+echo Creating package with NextPackageGenerator...
+NextPackageGenerator "!TEMP_DIR!" "!PACKAGENAME!"
+
+REM Clean up temporary directory
+echo Cleaning up temporary directory...
+rmdir /s /q "!TEMP_DIR!"
 
 REM Check result
 if exist "!PACKAGENAME!" (
@@ -193,10 +202,6 @@ if exist "!PACKAGENAME!" (
             echo Warning: Could not create git tag. Make sure you're in a git repository.
         )
     )
-    
-    echo.
-    echo Package contents:
-    "!SEVENZIP!" l "!PACKAGENAME!"
     
     REM Cleanup - ask if changelog file should be kept
     echo.
