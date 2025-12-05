@@ -13,7 +13,7 @@ import File
 # - Stream checker (not all machines have a needle cam)
 # - Check different CPU with compression
 
-enumeration Cameras(
+enumeration Cameras (
     Overview,
     Needle,
     Webcam
@@ -38,13 +38,13 @@ endprogram
 Allow the recording from different camera sources. 
 It also support an webcam device. So the user is free to plugin a webcam to the Machine for special purpose ;-).
 Usually it's terminated by the "StopRecording" Command.@
-export program StartRecording(
-    filename:string                     @doc:The filename without ending. Without encoding .avi with encoding .mp4@
-    optional cameraStream:Cameras       @doc:Allow the selection of the camera Stream. Default:Overview camera@
-    optional recordingTime:number       @doc:Default 300s = 5min. In this time the record can be stopped by the StopRecordingCommand. 
+export program StartRecording (
+    filename:string @doc:The filename without ending. Without encoding .avi with encoding .mp4@
+    optional cameraStream:Cameras @doc:Allow the selection of the camera Stream. Default:Overview camera@
+    optional recordingTime:number @doc:Default 300s = 5min. In this time the record can be stopped by the StopRecordingCommand. 
 If the record is not stopped during the this time and the program is finished the output is broken.
     @
-    optional compress:boolean           @doc:If set the result is compressed with libx264@
+    optional compress:boolean @doc:If set the result is compressed with libx264@
     ) returns number
 
     if Development::GetExecutionType == Development::ExecutionType.Visu
@@ -52,14 +52,14 @@ If the record is not stopped during the this time and the program is finished th
     endif
 
     if not cameraStream hasvalue
-        cameraStream =Cameras.Overview
+        cameraStream = Cameras.Overview
     endif
-    
+
     if not recordingTime hasvalue
         recordingTime = 300
- 
+
     endif
-    
+
     if not compress hasvalue
         compress = false
     endif
@@ -68,22 +68,22 @@ If the record is not stopped during the this time and the program is finished th
 
     # input stream
     append GetStreamParameter(cameraStream) to args
-    
+
     #no audio
     append "-an" to args
-    
+
     #time
     append "-t " + ValueToString(recordingTime) to args
-    
+
     #set loglevel
     append "-loglevel error" to args
-   
+
     #set override existing file
     append "-y" to args
-   
+
     # compression     
     if compress
-        append "-c:v libx264 -preset fast -crf 18 -f mp4" to args                
+        append "-c:v libx264 -preset fast -crf 18 -f mp4" to args
     else
         append "-c copy" to args
     endif
@@ -93,96 +93,104 @@ If the record is not stopped during the this time and the program is finished th
         filename = filename + ".mp4"
     else
         filename = filename + ".avi"
-    endif  
+    endif
     filename = File::GetOsPath(filename)
     append filename to args
-    
+
     argsString = ""
     foreach arg in args
         argsString <- argsString + " " + arg
     endforeach
-    
-    if debugMode    
+
+    # create output folder
+    foldername = File::GetDirectoryName(filename)
+    if not File::FolderExists foldername=foldername
+        File::FolderCreate foldername=foldername
+    endif
+
+    if debugMode
         Development::CopyToClipboard value=argsString
         StatusMessage = argsString
         Development::CopyToClipboard value=argsString
     endif
 
-    handle =  Plugin::PluginStart(
-        programPath="ffmpeg.exe"     
-        arguments=argsString) 
-    return handle     
+    handle = Plugin::PluginStart(
+        programPath="ffmpeg.exe"
+        arguments=argsString
+    )
+    return handle
 endprogram
 
 @doc: Stops the recording of a camera stream, previous started with "StartRecording".@
-export program StopRecording(
+export program StopRecording (
     ref recordId:number
     )
- 
+
     if Development::GetExecutionType == Development::ExecutionType.Visu
         return
     endif
- 
-    if recordId == -1    
+
+    if recordId == -1
         return
     endif
 
-    errorHandler = ""   
-    Plugin::PluginWriteLine processId=recordId line="q"  errorHandler=ref errorHandler 
+    errorHandler = ""
+    Plugin::PluginWriteLine processId=recordId line="q" errorHandler=ref errorHandler
     pluginResultLine = Plugin::PluginReadError processId=recordId errorHandler=ref errorHandler
     while errorHandler == ""
         if debugMode
-            StatusMessage = pluginResultLine 
-        endif         
+            StatusMessage = pluginResultLine
+        endif
         pluginResultLine = Plugin::PluginReadError processId=recordId errorHandler=ref errorHandler
-    endwhile 
-    
+    endwhile
+
     recordId = -1
 endprogram
 
 program GetWebcamNames returns string[]
     argsString = "ffmpeg -list_devices true -f dshow -i dummy "
     getWebcamNamesHandle = Plugin::PluginStart(
-        programPath="ffmpeg.exe"     
-        arguments=argsString)  
+        programPath="ffmpeg.exe"
+        arguments=argsString
+    )
 
     errorHandler = ""
-    result:string[]  ={}
-    
+    result:string[] = {}
+
     pluginResultLine = Plugin::PluginReadError processId=getWebcamNamesHandle
     while errorHandler == ""
-        if StringIndexOf(pluginResultLine, "[dshow") <> -1 and StringLastIndexOf(pluginResultLine, "(video)") <> -1        
-            stringStart = StringIndexOf(pluginResultLine,"""") + 1
-            stringEnd = StringLastIndexOf(pluginResultLine,"""")
-                        
-            name = StringSubString(pluginResultLine, stringStart, stringEnd -stringStart)               
+        if StringIndexOf(pluginResultLine, "[dshow") <> -1 and StringLastIndexOf(pluginResultLine, "(video)") <> -1
+            stringStart = StringIndexOf(pluginResultLine, """") + 1
+            stringEnd = StringLastIndexOf(pluginResultLine, """")
+
+            name = StringSubString(pluginResultLine, stringStart, stringEnd - stringStart)
             StatusMessage = name
-            append name to result        
+            append name to result
         endif
-          
+
         pluginResultLine = Plugin::PluginReadError processId=getWebcamNamesHandle errorHandler=ref errorHandler
     endwhile
-    
-    getWebcamNamesHandle = -1    
+
+    getWebcamNamesHandle = -1
     return result
 endprogram
 
-function GetStreamParameter( camera:Cameras) returns string
+function GetStreamParameter (camera:Cameras) returns string
     axisUrl = "http://192.168.242.242/mjpg/video.mjpg?camera="
     case camera
-    is Cameras.Overview    
-        return "-i " + axisUrl + "1"
-    is Cameras.Needle
-        return "-i " + axisUrl + "2"
-    is Cameras.Webcam
-        availableCameras = GetWebcamNames
-        if sizeof availableCameras ==0
-            System::RaiseError InvalidArgumentValue englishErrorDetails="No webcam for recording found!"
-        endif
-        
-        return "-f dshow -i video=""" + availableCameras[0] + """"
-    else 
-        System::RaiseError InvalidArgumentValue englishErrorDetails="Not Implemented camera type"
+        is Cameras.Overview
+            return "-i " + axisUrl + "1"
+        is Cameras.Needle
+            return "-i " + axisUrl + "2"
+        is Cameras.Webcam
+            availableCameras = GetWebcamNames
+            if sizeof availableCameras == 0
+                System::RaiseError InvalidArgumentValue englishErrorDetails="No webcam for recording found!"
+            endif
+
+            return "-f dshow -i video=""" + availableCameras[0] + """"
+        else
+            System::RaiseError InvalidArgumentValue englishErrorDetails="Not Implemented camera type"
     endcase
     return ""
 endfunction
